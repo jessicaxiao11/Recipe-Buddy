@@ -9,6 +9,7 @@
       "matches": [
         "http://*/*", "https://*/*"
       ],
+      "css": ["popup.css"],
       "js": ["popup.js"]
     }
   ]

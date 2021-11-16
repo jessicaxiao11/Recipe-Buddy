@@ -13,4 +13,51 @@
 	z-index: 999999999 !important;
 	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px 9999999px !important;
   width: 800px !important;
+  overflow: auto !important;
+}
+
+#title {
+  margin: 0;
+  font-family: 'Pattaya';
+  font-size: 40px;
+  color: #FAA556;
+  margin-left: 10px;
+}
+
+#ingredientsBox {
+  position: relative;
+  width: 700px;
+  left: 40px;
+  min-height: 200px;
+  max-height: 500px;
+  background-color: lightblue;
+}
+
+#instructionsBox {
+  position: relative;
+  width: 700px;
+  left: 40px;
+  height: 300px;
+  background-color: lightblue;
+  margin-top: 40px;
+}
+
+#addToPlanner {
+  position: relative;
+  width: 200px;
+  left: 290px;
+  height: 40px;
+  background-color: #FAA556;
+  border-radius: 20px;;
+  margin-top: 20px;
+}
+
+#addToPlanner > p {
+  margin: 0;
+  position: absolute;
+  top: 2px;
+  left: 35px;
+  font-family: 'Pattaya';
+  color: #FFFFFF;
+  font-size: 22px;
 }

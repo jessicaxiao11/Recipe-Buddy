@@ -13,6 +13,12 @@ function showRecipe() {
     instructionsText.push(instructions[i].textContent);
   }
 
+  console.log(ingredientsText);
+  console.log(instructionsText);
+  console.log(ingredients);
+  console.log(instructions);
+  console.log(document.location.hostname);
+
   // create Recipe Buddy interface
 
   var link = document.createElement('link');
@@ -37,6 +43,38 @@ function showRecipe() {
   ingredientsBox.id = "ingredientsBox";
   box.appendChild(ingredientsBox);
 
+  const ingredientsLeft = document.createElement("div");
+  ingredientsLeft.id = "ingredientsLeft";
+  ingredientsLeft.className = "column";
+  ingredientsBox.appendChild(ingredientsLeft);
+  const leftUL = document.createElement("ul");
+  leftUL.className = "ingredientsUL";
+  ingredientsLeft.appendChild(leftUL);
+
+  const ingredientsRight = document.createElement("div");
+  ingredientsRight.id = "ingredientsRight";
+  ingredientsRight.className = "column";
+  ingredientsBox.appendChild(ingredientsRight);
+  const rightUL = document.createElement("ul");
+  rightUL.className = "ingredientsUL";
+  ingredientsRight.appendChild(rightUL);
+
+  const mid = Math.floor(ingredientsText.length / 2);
+  console.log(ingredientsText);
+  console.log(mid);
+  for (var i = 0; i < mid; i++) {
+    const li = document.createElement("li");
+    console.log("reached");
+    li.innerHTML = ingredientsText[i];
+    leftUL.appendChild(li);
+  }
+
+  for (var i = mid; i < ingredientsText.length; i++) {
+    const li = document.createElement("li");
+    li.innerHTML = ingredientsText[i];
+    rightUL.appendChild(li);
+  }
+
   // add first instruction to HTML
   const instructionsBox = document.createElement("div");
   instructionsBox.id = "instructionsBox";
@@ -53,4 +91,6 @@ function showRecipe() {
   box.appendChild(addToPlanner);
 }
 
-showRecipe();
+if (document.location.hostname === 'damndelicious.net') {
+  showRecipe();
+}

@@ -26,11 +26,25 @@
 
 #ingredientsBox {
   position: relative;
-  width: 700px;
   left: 40px;
+}
+
+#ingredientsBox:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.column {
+  float: left;
+  width: 340px;
   min-height: 200px;
   max-height: 500px;
   background-color: lightblue;
+}
+
+#ingredientsRight {
+  margin-left: 20px;
 }
 
 #instructionsBox {
@@ -61,3 +75,9 @@
   color: #FFFFFF;
   font-size: 22px;
 }
+
+.ingredientsUL {
+  list-style-type: none;
+}
+
+

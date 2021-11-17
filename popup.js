@@ -13,12 +13,6 @@ function showRecipe() {
     instructionsText.push(instructions[i].textContent);
   }
 
-  console.log(ingredientsText);
-  console.log(instructionsText);
-  console.log(ingredients);
-  console.log(instructions);
-  console.log(document.location.hostname);
-
   // create Recipe Buddy interface
 
   var link = document.createElement('link');
@@ -47,17 +41,11 @@ function showRecipe() {
   ingredientsLeft.id = "ingredientsLeft";
   ingredientsLeft.className = "column";
   ingredientsBox.appendChild(ingredientsLeft);
-  // const leftUL = document.createElement("ul");
-  // leftUL.className = "ingredientsUL";
-  // ingredientsLeft.appendChild(leftUL);
 
   const ingredientsRight = document.createElement("div");
   ingredientsRight.id = "ingredientsRight";
   ingredientsRight.className = "column";
   ingredientsBox.appendChild(ingredientsRight);
-  // const rightUL = document.createElement("ul");
-  // rightUL.className = "ingredientsUL";
-  // ingredientsRight.appendChild(rightUL);
 
   const mid = Math.ceil(ingredientsText.length / 2);
   console.log(ingredientsText);
@@ -92,6 +80,21 @@ function showRecipe() {
   const instructionsBox = document.createElement("div");
   instructionsBox.id = "instructionsBox";
   box.appendChild(instructionsBox);
+
+  const back = document.createElement("img");
+  const arrow = chrome.runtime.getURL(`images/arrow.png`);
+  back.src = arrow;
+  back.id = "back";
+  instructionsBox.appendChild(back);
+
+  const next = document.createElement("img");
+  next.src = arrow
+  next.id = "next";
+  instructionsBox.appendChild(next);
+
+  const instruction = document.createElement("div");
+  instruction.id = "instruction";
+  instructionsBox.appendChild(instruction);
 
   // add Add to Planner button
   const addToPlanner = document.createElement("div");

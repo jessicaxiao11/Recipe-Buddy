@@ -12,5 +12,10 @@
       "css": ["popup.css"],
       "js": ["popup.js"]
     }
-  ]
+  ],
+  "web_accessible_resources": [{
+    "resources": ["images/*"],
+    "matches": ["http://*/*", "https://*/*"],
+    "extension_ids": []
+    }]
 }

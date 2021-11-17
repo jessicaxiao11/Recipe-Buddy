@@ -1,13 +1,13 @@
 /* Reference: https://github.com/sean-public/RecipeFilter/ */
 
 #recipeBox {
-  height: 700px !important;
+  height: 775px !important;
   display: block !important;
   position: fixed !important;
 	top: 0 !important;
 	left: 50% !important;
 	transform: translate(-50%, 0) !important;
-	margin: 50px 20px 20px 20px !important;
+	margin: 20px 20px 20px 20px !important;
 	padding: 10px !important;
 	background: #FCFCFC !important;
 	z-index: 999999999 !important;
@@ -52,8 +52,8 @@
   width: 700px;
   left: 40px;
   height: 300px;
-  background-color: lightblue;
   margin-top: 40px;
+  background-color:rgba(0, 0, 0, 0.5)
 }
 
 #addToPlanner {
@@ -83,6 +83,30 @@
 .ingredientsLabel {
   font-family: 'Ubuntu';
   font-size: 12px;
+}
+
+#back {
+  width: 60px;
+  transform: rotate(180deg);
+  position: relative;
+  top: 120px;
+  opacity: 0.2;
+}
+
+#next {
+  width: 60px;
+  position: relative;
+  top: 120px;
+  left: 575px;
+}
+
+#instruction {
+  background-color: lightblue;
+  position: absolute;
+  top: 15px;
+  left: 130px;
+  height: 90%;
+  width: 60%;
 }
 
 

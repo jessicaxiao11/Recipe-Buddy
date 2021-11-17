@@ -23,7 +23,7 @@ function showRecipe() {
 
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Pattaya&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Pattaya&family=Ubuntu&display=swap';
   document.head.appendChild(link);
 
   // create recipe buddy overlay
@@ -47,32 +47,45 @@ function showRecipe() {
   ingredientsLeft.id = "ingredientsLeft";
   ingredientsLeft.className = "column";
   ingredientsBox.appendChild(ingredientsLeft);
-  const leftUL = document.createElement("ul");
-  leftUL.className = "ingredientsUL";
-  ingredientsLeft.appendChild(leftUL);
+  // const leftUL = document.createElement("ul");
+  // leftUL.className = "ingredientsUL";
+  // ingredientsLeft.appendChild(leftUL);
 
   const ingredientsRight = document.createElement("div");
   ingredientsRight.id = "ingredientsRight";
   ingredientsRight.className = "column";
   ingredientsBox.appendChild(ingredientsRight);
-  const rightUL = document.createElement("ul");
-  rightUL.className = "ingredientsUL";
-  ingredientsRight.appendChild(rightUL);
+  // const rightUL = document.createElement("ul");
+  // rightUL.className = "ingredientsUL";
+  // ingredientsRight.appendChild(rightUL);
 
-  const mid = Math.floor(ingredientsText.length / 2);
+  const mid = Math.ceil(ingredientsText.length / 2);
   console.log(ingredientsText);
   console.log(mid);
   for (var i = 0; i < mid; i++) {
-    const li = document.createElement("li");
-    console.log("reached");
-    li.innerHTML = ingredientsText[i];
-    leftUL.appendChild(li);
+    const label = document.createElement("label");
+    label.className = "ingredientsLabel";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    const text = document.createTextNode(ingredientsText[i]);
+    ingredientsLeft.appendChild(label);
+    label.appendChild(input);
+    label.appendChild(text);
+    const br = document.createElement("br");
+    ingredientsLeft.appendChild(br);
   }
 
   for (var i = mid; i < ingredientsText.length; i++) {
-    const li = document.createElement("li");
-    li.innerHTML = ingredientsText[i];
-    rightUL.appendChild(li);
+    const label = document.createElement("label");
+    label.className = "ingredientsLabel";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    const text = document.createTextNode(ingredientsText[i]);
+    ingredientsRight.appendChild(label);
+    label.appendChild(input);
+    label.appendChild(text);
+    const br = document.createElement("br");
+    ingredientsRight.appendChild(br);
   }
 
   // add first instruction to HTML

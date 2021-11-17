@@ -27,6 +27,7 @@
 #ingredientsBox {
   position: relative;
   left: 40px;
+  width: 740px;
 }
 
 #ingredientsBox:after {
@@ -40,7 +41,6 @@
   width: 340px;
   min-height: 200px;
   max-height: 500px;
-  background-color: lightblue;
 }
 
 #ingredientsRight {
@@ -78,6 +78,11 @@
 
 .ingredientsUL {
   list-style-type: none;
+}
+
+.ingredientsLabel {
+  font-family: 'Ubuntu';
+  font-size: 12px;
 }
 
 

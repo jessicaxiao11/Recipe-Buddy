@@ -1,14 +1,16 @@
+var currInstruction = 0;
+var ingredientsText = []
+var instructionsText = []
+
 function showRecipe() {
   // parse for ingredients
   const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li'));
-  var ingredientsText = []
   for (var i = 0; i < ingredients.length; i++) {
     ingredientsText.push(ingredients[i].textContent);
   }
 
   // parse for instructions
   const instructions = Array.from(document.querySelectorAll('.instructions>ol>li'));
-  var instructionsText = []
   for (var i = 0; i < instructions.length; i++) {
     instructionsText.push(instructions[i].textContent);
   }
@@ -48,8 +50,6 @@ function showRecipe() {
   ingredientsBox.appendChild(ingredientsRight);
 
   const mid = Math.ceil(ingredientsText.length / 2);
-  console.log(ingredientsText);
-  console.log(mid);
   for (var i = 0; i < mid; i++) {
     const label = document.createElement("label");
     label.className = "ingredientsLabel";
@@ -85,16 +85,28 @@ function showRecipe() {
   const arrow = chrome.runtime.getURL(`images/arrow.png`);
   back.src = arrow;
   back.id = "back";
+  back.addEventListener("click", function(){changeInstruction(-1)});
   instructionsBox.appendChild(back);
 
   const next = document.createElement("img");
   next.src = arrow
   next.id = "next";
+  next.addEventListener("click", function(){changeInstruction(1)});
   instructionsBox.appendChild(next);
 
   const instruction = document.createElement("div");
   instruction.id = "instruction";
   instructionsBox.appendChild(instruction);
+
+  const instructionNum = document.createElement("p");
+  instructionNum.id = "instructionNum";
+  instructionNum.innerHTML = "1.";
+  instruction.appendChild(instructionNum);
+
+  const instructionText = document.createElement("p");
+  instructionText.id = "instructionText";
+  instructionText.innerHTML = instructionsText[0];
+  instruction.appendChild(instructionText);
 
   // add Add to Planner button
   const addToPlanner = document.createElement("div");
@@ -103,9 +115,39 @@ function showRecipe() {
   addToPlanner.id = "addToPlanner";
   addToPlannerP.appendChild(addToPlannerText);
   addToPlanner.appendChild(addToPlannerP);
-  // addToPlanner.addEventListener('click', )
+  // addToPlanner.addEventListener('click', hideBox);
   box.appendChild(addToPlanner);
 }
+
+function changeInstruction(delta) {
+  if (currInstruction + delta < 0 || currInstruction + delta >= instructionsText.length) {
+    return;
+  }
+  currInstruction += delta;
+  const instructionNum = document.getElementById("instructionNum");
+  const instructionText = document.getElementById("instructionText");
+  instructionNum.innerHTML = (currInstruction + 1).toString() + ".";
+  instructionText.innerHTML = instructionsText[currInstruction];
+
+  const back = document.getElementById("back");
+  const next = document.getElementById("next");
+  back.style.opacity = "0.6";
+  next.style.opacity = "0.6";
+
+  if (currInstruction === 0) {
+    back.style.opacity = "0.2";
+  }
+
+  if (currInstruction === (instructionsText.length-1)) {
+    next.style.opacity = "0.2";
+  }
+}
+
+function hideBox() {
+  const box = document.getElementById("recipeBox");
+  box.setAttribute('style', 'display: none !important');
+}
+
 
 if (document.location.hostname === 'damndelicious.net') {
   showRecipe();

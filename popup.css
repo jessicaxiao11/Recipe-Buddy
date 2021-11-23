@@ -3,7 +3,7 @@
 #recipeBox {
   height: 775px !important;
   display: block !important;
-  position: fixed !important;
+  position: absolute !important;
 	top: 0 !important;
 	left: 50% !important;
 	transform: translate(-50%, 0) !important;
@@ -131,6 +131,22 @@
   margin: 0;
   align-items: center;
   text-align: center;
+}
+
+#dropdowns {
+  position: relative;
+  left: 40px;
+  width: 740px;
+}
+
+#dropdowns:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#dropdownWeekday {
+  margin-left: 20px;
 }
 
 

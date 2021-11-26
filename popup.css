@@ -145,8 +145,55 @@
   clear: both;
 }
 
+.shortColumn {
+  float: left;
+  width: 340px;
+  height: 40px;
+}
+
 #dropdownWeekday {
   margin-left: 20px;
 }
 
+select {
+  position: relative;
+  border-radius: 10px;
+  font-family: 'Ubuntu';
+  font-size: 18px;
+}
+
+#selectWeek {
+  left: 80px;
+  padding: 5px 50px 5px 40px;
+}
+
+#selectWeekday {
+  left: 60px;
+  padding: 5px 35px 5px 25px;
+}
+
+option {
+  font-family: 'Ubuntu';
+}
+
+#add {
+  position: relative;
+  width: 100px;
+  left: 350px;
+  height: 40px;
+  background-color: #FAA556;
+  border-radius: 20px;;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+#add > p {
+  margin: 0;
+  position: absolute;
+  top: 2px;
+  left: 30px;
+  font-family: 'Pattaya';
+  color: #FFFFFF;
+  font-size: 22px;
+}
 

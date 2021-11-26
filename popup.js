@@ -150,7 +150,7 @@ function addPlanner() {
 
   // extend size of instruction box
   const box = document.getElementById("recipeBox");
-  box.setAttribute('style', 'height: 1000px !important');
+  box.setAttribute('style', 'height: 800px !important');
 
   // add dropdowns
   const dropdowns = document.createElement("div");
@@ -159,65 +159,54 @@ function addPlanner() {
 
   const dropdownWeek = document.createElement("div");
   dropdownWeek.id = "dropdownWeek";
-  dropdownWeek.className = "column select";
+  dropdownWeek.className = "shortColumn";
   dropdowns.appendChild(dropdownWeek);
 
   const selectWeek = document.createElement("select");
+  selectWeek.id = "selectWeek";
   dropdownWeek.append(selectWeek);
-
-
-  
-
   const weeks = ["Select Week", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (var i=0; i < weeks.length; i++) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.innerHTML = weeks[i];
+    selectWeek.append(option);
+  }
 
   const dropdownWeekday = document.createElement("div");
   dropdownWeekday.id = "dropdownWeekday";
-  dropdownWeekday.className = "column select";
+  dropdownWeekday.className = "shortColumn";
   dropdowns.appendChild(dropdownWeekday);
 
+  const selectWeekday = document.createElement("select");
+  selectWeekday.id = "selectWeekday";
+  dropdownWeekday.append(selectWeekday);
+  const weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (var i=0; i < weekdays.length; i++) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.innerHTML = weekdays[i];
+    selectWeekday.append(option);
+  }
 
+  // add "Add!" button
+  const add = document.createElement("div");
+  const addP = document.createElement("p");
+  addP.innerHTML = "Add!";
+  add.id = "add";
+  add.appendChild(addP);
+  add.addEventListener('click', submitToPlanner);
+  box.appendChild(add);
+}
 
+function submitToPlanner() {
+  var selectWeek = document.getElementById("selectWeek");
+  var week = selectWeek.options[selectWeek.selectedIndex].value;
+  console.log(week);
 
-
-  // // add dropdowns
-  // const dropdowns = document.createElement("div");
-  // dropdowns.id = "dropdowns";
-  // box.appendChild(dropdowns);
-
-  // const dropdownWeek = document.createElement("div");
-  // dropdownWeek.id = "dropdownWeek";
-  // dropdownWeek.className = "column";
-  // dropdowns.appendChild(dropdownWeek);
-
-  // // selection button for week dropdown
-  // const selectWeek = document.createElement("div");
-  // selectWeek.className = "select";
-  // selectWeek.id = "selectWeek";
-  // const selectWeekText = document.createElement("p");
-  // selectWeekText.className = "selectText";
-  // selectWeekText.innerHTML = "Select Week";
-  // const selectWeekArrow = document.createElement("img");
-  // selectWeekArrow.className = "selectArrow";
-  // selectWeekArrow.id = "selectWeekArrow";
-  // const arrow = chrome.runtime.getURL(`images/arrow.png`);
-  // selectWeekText.src = arrow;
-  // selectWeek.appendChild(selectWeekText);
-  // selectWeek.appendChild(selectWeekArrow);
-  // dropdownWeek.appendChild(selectWeek);
-
-  // // actual options for week dropdown
-  // const dropdownWeekOptions = document.createElement("div");
-  // dropdownWeek.id = "dropdownWeekOptions";
-  // dropdownWeek.className = "options";
-  // dropdownWeek.appendChild(dropdownWeekOptions);
-
-  // const weeks = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-  // const dropdownWeekday = document.createElement("div");
-  // dropdownWeekday.id = "dropdownWeekday";
-  // dropdownWeekday.className = "column";
-  // dropdowns.appendChild(dropdownWeekday);
-
+  var selectWeekday = document.getElementById("selectWeekday");
+  var weekday = selectWeekday.options[selectWeekday.selectedIndex].value;
+  console.log(weekday);
 }
 
 function hideBox() {

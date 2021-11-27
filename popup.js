@@ -111,9 +111,9 @@ function showRecipe() {
   // add Add to Planner button
   const addToPlanner = document.createElement("div");
   const addToPlannerP = document.createElement("p");
-  const addToPlannerText = document.createTextNode("Add to Planner");
+  addToPlannerP.id = "addToPlannerP";
+  addToPlannerP.innerHTML = "Add to Planner";
   addToPlanner.id = "addToPlanner";
-  addToPlannerP.appendChild(addToPlannerText);
   addToPlanner.appendChild(addToPlannerP);
   addToPlanner.addEventListener('click', addPlanner);
   box.appendChild(addToPlanner);
@@ -143,6 +143,18 @@ function changeInstruction(delta) {
   }
 }
 
+// source: https://stackoverflow.com/questions/1025693/how-to-get-next-week-date-in-javascript
+Date.prototype.getNextWeekDay = function(d) {
+  if (d) {
+    var next = this;
+    next.setDate(this.getDate() - this.getDay() + 7 + d);
+    return next;
+  }
+}
+
+const weeks = ["Select Week", "This Week", "Next Week"];
+const weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 function addPlanner() {
   // hide add to planner button
   const addToPlanner = document.getElementById("addToPlanner");
@@ -165,7 +177,19 @@ function addPlanner() {
   const selectWeek = document.createElement("select");
   selectWeek.id = "selectWeek";
   dropdownWeek.append(selectWeek);
-  const weeks = ["Select Week", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  // generate next few weeks
+  var now = new Date();
+  var nextDate = now.getNextWeekDay(1);
+  var nextNextDate = new Date(nextDate).getNextWeekDay(1);
+  
+  for (var i=0; i < 8; i++) {
+    var date = new Date(nextNextDate).getNextWeekDay(1);
+    var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
+    weeks.push(dateString);
+    nextNextDate = date;
+  }
+
   for (var i=0; i < weeks.length; i++) {
     const option = document.createElement("option");
     option.value = i;
@@ -181,7 +205,6 @@ function addPlanner() {
   const selectWeekday = document.createElement("select");
   selectWeekday.id = "selectWeekday";
   dropdownWeekday.append(selectWeekday);
-  const weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (var i=0; i < weekdays.length; i++) {
     const option = document.createElement("option");
     option.value = i;
@@ -199,14 +222,53 @@ function addPlanner() {
   box.appendChild(add);
 }
 
+// nested dictionary, first level is by week and next level is by weekday
+var plannerDict = {};
+
 function submitToPlanner() {
+  // add recipe to planner storage
   var selectWeek = document.getElementById("selectWeek");
-  var week = selectWeek.options[selectWeek.selectedIndex].value;
-  console.log(week);
+  var week = selectWeek.options[selectWeek.selectedIndex].value - 1;
 
   var selectWeekday = document.getElementById("selectWeekday");
-  var weekday = selectWeekday.options[selectWeekday.selectedIndex].value;
-  console.log(weekday);
+  var weekday = selectWeekday.options[selectWeekday.selectedIndex].value - 1;
+
+  if (week in plannerDict) {
+    var weekRecipes = plannerDict[week];
+    if (weekday in weekRecipes) {
+      var weekdayRecipes = weekRecipes[weekday];
+      weekdayRecipes.push("hello");
+    } else {
+      var weekdayRecipes = ["hello"];
+    }
+
+    weekRecipes[weekday] = weekdayRecipes;
+    plannerDict[week] = weekRecipes;
+  } else {
+    var weekRecipes = {}
+    weekRecipes[weekday] = ["hello"];
+    plannerDict[week] = weekRecipes;
+  }
+
+  // show add to planner button
+  const addToPlanner = document.getElementById("addToPlanner");
+  addToPlanner.style.display = "block";
+
+  // change add to planner to "open planner"
+  const addToPlannerP = document.getElementById("addToPlannerP");
+  addToPlannerP.innerHTML = "Open Planner";
+
+  // reset size of instruction box
+  const box = document.getElementById("recipeBox");
+  box.setAttribute('style', 'height: 775px !important');
+
+  // hide dropdowns
+  const dropdowns = document.getElementById("dropdowns");
+  dropdowns.style.display = "none";
+
+  // hide "Add!" button
+  const add = document.getElementById("add");
+  add.style.display = "none";
 }
 
 function hideBox() {

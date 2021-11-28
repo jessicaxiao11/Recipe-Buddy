@@ -16,12 +16,24 @@
   overflow: auto !important;
 }
 
-#title {
+#title, #plannerTitle {
   margin: 0;
   font-family: 'Pattaya';
   font-size: 40px;
   color: #FAA556;
   margin-left: 10px;
+}
+
+#switchToPlanner, #switchToRecipe {
+  margin: 0;
+  font-family: 'Pattaya';
+  font-size: 14px;
+  color: #FAA556;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  text-decoration-line: underline;
+  cursor: pointer;
 }
 
 #ingredientsBox {
@@ -195,5 +207,21 @@ option {
   font-family: 'Pattaya';
   color: #FFFFFF;
   font-size: 22px;
+}
+
+#plannerBox {
+  height: 775px !important;
+  display: block !important;
+  position: absolute !important;
+	top: 0 !important;
+	left: 50% !important;
+	transform: translate(-50%, 0) !important;
+	margin: 20px 20px 20px 20px !important;
+	padding: 10px !important;
+	background: #FCFCFC !important;
+	z-index: 999999999 !important;
+	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px 9999999px !important;
+  width: 1000px !important;
+  overflow: auto !important;
 }
 

@@ -3,6 +3,13 @@ var ingredientsText = []
 var instructionsText = []
 
 function showRecipe() {
+  // check if recipe view was already created
+  var box = document.getElementById("recipeBox");
+  if (box !== null) {
+    box.setAttribute('style', 'display: block !important');
+    return;
+  }
+
   // parse for ingredients
   const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li'));
   for (var i = 0; i < ingredients.length; i++) {
@@ -23,7 +30,7 @@ function showRecipe() {
   document.head.appendChild(link);
 
   // create recipe buddy overlay
-  const box = document.createElement("div");
+  box = document.createElement("div");
   box.id = "recipeBox";
   document.body.insertBefore(box, document.body.firstChild);
 
@@ -33,6 +40,13 @@ function showRecipe() {
   title.id = "title";
   title.appendChild(text);
   box.appendChild(title);
+
+  // add switch option
+  const switchToPlanner = document.createElement("p");
+  switchToPlanner.innerHTML = "switch to planner view";
+  switchToPlanner.id = "switchToPlanner";
+  switchToPlanner.addEventListener("click", switchPlanner);
+  box.appendChild(switchToPlanner);
 
   // add ingredients to HTML
   const ingredientsBox = document.createElement("div");
@@ -119,6 +133,57 @@ function showRecipe() {
   box.appendChild(addToPlanner);
 }
 
+function switchPlanner() {
+  // hide recipe box
+  var recipeBox = document.getElementById("recipeBox");
+  recipeBox.setAttribute('style', 'display: none !important');
+
+  // show planner view, with switch option
+  showPlanner(true);
+}
+
+function switchRecipe() {
+  // hide planner box
+  var plannerBox = document.getElementById("plannerBox");
+  plannerBox.setAttribute('style', 'display: none !important');
+
+  // show recipe view
+  showRecipe();
+}
+
+function showPlanner(switchOption) {
+  // check if planner view was already created
+  var box = document.getElementById("plannerBox");
+  if (box !== null) {
+    box.setAttribute('style', 'display: block !important');
+    return;
+  }
+
+  // create planner box overlay
+  box = document.createElement("div");
+  box.id = "plannerBox";
+  document.body.insertBefore(box, document.body.firstChild);
+
+  // add recipe buddy title
+  const title = document.createElement("p");
+  const text = document.createTextNode("Recipe Buddy");
+  title.id = "plannerTitle";
+  title.appendChild(text);
+  box.appendChild(title);
+
+
+  // if switchOption, add switch to recipe view
+  if (switchOption) {
+    const switchToRecipe = document.createElement("p");
+    switchToRecipe.innerHTML = "switch to recipe view";
+    switchToRecipe.id = "switchToRecipe";
+    switchToRecipe.addEventListener("click", switchRecipe);
+    box.appendChild(switchToRecipe);
+  }
+
+
+}
+
 function changeInstruction(delta) {
   if (currInstruction + delta < 0 || currInstruction + delta >= instructionsText.length) {
     return;
@@ -154,6 +219,18 @@ Date.prototype.getNextWeekDay = function(d) {
 
 const weeks = ["Select Week", "This Week", "Next Week"];
 const weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// generate next few weeks
+var now = new Date();
+var nextDate = now.getNextWeekDay(1);
+var nextNextDate = new Date(nextDate).getNextWeekDay(1);
+
+for (var i=0; i < 8; i++) {
+  var date = new Date(nextNextDate).getNextWeekDay(1);
+  var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
+  weeks.push(dateString);
+  nextNextDate = date;
+}
+console.log(weeks);
 
 function addPlanner() {
   // hide add to planner button
@@ -164,8 +241,17 @@ function addPlanner() {
   const box = document.getElementById("recipeBox");
   box.setAttribute('style', 'height: 800px !important');
 
+  // check if dropdowns already created
+  var dropdowns = document.getElementById("dropdowns");
+  var add = document.getElementById("add");
+  if (dropdowns !== null) {
+    dropdowns.style.display = "block";
+    add.style.display = "block"
+    return;
+  }
+
   // add dropdowns
-  const dropdowns = document.createElement("div");
+  dropdowns = document.createElement("div");
   dropdowns.id = "dropdowns";
   box.appendChild(dropdowns);
 
@@ -177,18 +263,6 @@ function addPlanner() {
   const selectWeek = document.createElement("select");
   selectWeek.id = "selectWeek";
   dropdownWeek.append(selectWeek);
-
-  // generate next few weeks
-  var now = new Date();
-  var nextDate = now.getNextWeekDay(1);
-  var nextNextDate = new Date(nextDate).getNextWeekDay(1);
-  
-  for (var i=0; i < 8; i++) {
-    var date = new Date(nextNextDate).getNextWeekDay(1);
-    var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
-    weeks.push(dateString);
-    nextNextDate = date;
-  }
 
   for (var i=0; i < weeks.length; i++) {
     const option = document.createElement("option");
@@ -213,7 +287,7 @@ function addPlanner() {
   }
 
   // add "Add!" button
-  const add = document.createElement("div");
+  add = document.createElement("div");
   const addP = document.createElement("p");
   addP.innerHTML = "Add!";
   add.id = "add";
@@ -233,30 +307,28 @@ function submitToPlanner() {
   var selectWeekday = document.getElementById("selectWeekday");
   var weekday = selectWeekday.options[selectWeekday.selectedIndex].value - 1;
 
+  var recipeName = (document.getElementsByClassName("post-title"))[0].innerHTML;
+
   if (week in plannerDict) {
     var weekRecipes = plannerDict[week];
     if (weekday in weekRecipes) {
       var weekdayRecipes = weekRecipes[weekday];
-      weekdayRecipes.push("hello");
+      weekdayRecipes.push(recipeName);
     } else {
-      var weekdayRecipes = ["hello"];
+      var weekdayRecipes = [recipeName];
     }
 
     weekRecipes[weekday] = weekdayRecipes;
     plannerDict[week] = weekRecipes;
   } else {
     var weekRecipes = {}
-    weekRecipes[weekday] = ["hello"];
+    weekRecipes[weekday] = [recipeName];
     plannerDict[week] = weekRecipes;
   }
 
   // show add to planner button
   const addToPlanner = document.getElementById("addToPlanner");
   addToPlanner.style.display = "block";
-
-  // change add to planner to "open planner"
-  const addToPlannerP = document.getElementById("addToPlannerP");
-  addToPlannerP.innerHTML = "Open Planner";
 
   // reset size of instruction box
   const box = document.getElementById("recipeBox");

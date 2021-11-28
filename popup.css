@@ -225,3 +225,67 @@ option {
   overflow: auto !important;
 }
 
+
+#weekBox {
+  position: relative;
+  width: 250px;
+  left: 375px;
+  height: 40px;
+  /* background-color:rgba(0, 0, 0, 0.2) */
+}
+
+#prevWeek {
+  width: 20px;
+  transform: rotate(180deg);
+  position: relative;
+  top: 5px;
+  left: 15px;
+  opacity: 0.2;
+  cursor: pointer;
+}
+
+#nextWeek {
+  width: 20px;
+  position: relative;
+  top: 5px;
+  left: 190px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+#weekPlanner {
+  margin: 0;
+  position: absolute;
+  top: 3px;
+  font-family: 'Ubuntu';
+  font-size: 18px;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  text-align: center;
+  width: 150px;
+}
+
+#weekdays {
+  position: relative;
+  left: 40px;
+  top: 100px;
+  width: 740px;
+}
+
+#weekdays:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.weekday {
+  background-color:rgba(0, 0, 0, 0.2);
+  float: left;
+  margin-left: 20px;
+  height: 700px;
+  width: 200px;
+}
+
+

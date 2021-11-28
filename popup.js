@@ -151,6 +151,8 @@ function switchRecipe() {
   showRecipe();
 }
 
+var numWeek = 1;
+
 function showPlanner(switchOption) {
   // check if planner view was already created
   var box = document.getElementById("plannerBox");
@@ -181,7 +183,63 @@ function showPlanner(switchOption) {
     box.appendChild(switchToRecipe);
   }
 
+  // add week, and ability to switch weeks
+  const weekBox = document.createElement("div");
+  weekBox.id = "weekBox";
+  box.appendChild(weekBox);
 
+  const prev = document.createElement("img");
+  const arrow = chrome.runtime.getURL(`images/arrow.png`);
+  prev.src = arrow;
+  prev.id = "prevWeek";
+  prev.addEventListener("click", function(){changeWeek(-1)});
+  weekBox.appendChild(prev);
+
+  const next = document.createElement("img");
+  next.src = arrow
+  next.id = "nextWeek";
+  next.addEventListener("click", function(){changeWeek(1)});
+  weekBox.appendChild(next);
+
+  const week = document.createElement("p");
+  week.id = "weekPlanner";
+  week.innerHTML = weeks[numWeek];
+  weekBox.appendChild(week);
+
+  // display weekdays
+  const weekdaysBox = document.createElement("div");
+  weekdaysBox.id = "weekdays";
+  box.appendChild(weekdaysBox);
+  console.log("here");
+
+  for (var i = 1; i < weekdays.length; i++) {
+    console.log("blah");
+    const weekday = document.createElement("div");
+    weekday.className = "weekday";
+    weekdaysBox.appendChild(weekday);
+  }
+}
+
+function changeWeek(delta) {
+  if (numWeek + delta < 1 || numWeek + delta >= weeks.length) {
+    return;
+  }
+  numWeek += delta;
+  const week = document.getElementById("weekPlanner");
+  week.innerHTML = weeks[numWeek];
+
+  const prev = document.getElementById("prevWeek");
+  const next = document.getElementById("nextWeek");
+  prev.style.opacity = "0.6";
+  next.style.opacity = "0.6";
+
+  if (numWeek === 1) {
+    prev.style.opacity = "0.2";
+  }
+
+  if (numWeek === (weeks.length-1)) {
+    next.style.opacity = "0.2";
+  }
 }
 
 function changeInstruction(delta) {

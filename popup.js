@@ -153,6 +153,7 @@ function switchRecipe() {
   // hide planner box
   var plannerBox = document.getElementById("plannerBox");
   plannerBox.setAttribute('style', 'display: none !important');
+  numWeek = 1;
 
   // show recipe view
   showRecipe();
@@ -218,9 +219,46 @@ function showPlanner(switchOption) {
   week.innerHTML = weeks[numWeek];
   weekBox.appendChild(week);
 
+  drawWeekdays();
+}
+
+function changeWeek(delta) {
+  if (numWeek + delta < 1 || numWeek + delta >= weeks.length) {
+    return;
+  }
+  numWeek += delta;
+  const week = document.getElementById("weekPlanner");
+  week.innerHTML = weeks[numWeek];
+
+  const prev = document.getElementById("prevWeek");
+  const next = document.getElementById("nextWeek");
+  prev.style.opacity = "0.6";
+  next.style.opacity = "0.6";
+
+  if (numWeek === 1) {
+    prev.style.opacity = "0.2";
+  }
+
+  if (numWeek === (weeks.length-1)) {
+    next.style.opacity = "0.2";
+  }
+
+  drawWeekdays();
+}
+
+function drawWeekdays() {
+  // remove old weekdays if one existed
+  var weekdaysBox = document.getElementById("weekdays");
+  if (weekdaysBox) {
+    if (weekdaysBox.parentNode) {
+      weekdaysBox.parentNode.removeChild(weekdaysBox);
+    }
+  }
+
   // display weekdays
-  const weekdaysBox = document.createElement("div");
+  weekdaysBox = document.createElement("div");
   weekdaysBox.id = "weekdays";
+  const box = document.getElementById("plannerBox");
   box.appendChild(weekdaysBox);
 
 
@@ -264,28 +302,6 @@ function showPlanner(switchOption) {
       }
     }
   });
-}
-
-function changeWeek(delta) {
-  if (numWeek + delta < 1 || numWeek + delta >= weeks.length) {
-    return;
-  }
-  numWeek += delta;
-  const week = document.getElementById("weekPlanner");
-  week.innerHTML = weeks[numWeek];
-
-  const prev = document.getElementById("prevWeek");
-  const next = document.getElementById("nextWeek");
-  prev.style.opacity = "0.6";
-  next.style.opacity = "0.6";
-
-  if (numWeek === 1) {
-    prev.style.opacity = "0.2";
-  }
-
-  if (numWeek === (weeks.length-1)) {
-    next.style.opacity = "0.2";
-  }
 }
 
 function changeInstruction(delta) {
@@ -404,9 +420,11 @@ function submitToPlanner() {
   // add recipe to planner storage
   var selectWeek = document.getElementById("selectWeek");
   var week = selectWeek.options[selectWeek.selectedIndex].value;
+  selectWeek.selectedIndex = 0;
 
   var selectWeekday = document.getElementById("selectWeekday");
   var weekday = selectWeekday.options[selectWeekday.selectedIndex].value;
+  selectWeekday.selectedIndex = 0;
 
   var recipeName = (document.getElementsByClassName("post-title"))[0].innerHTML;
   var recipeURL = window.location.toString();

@@ -1,3 +1,10 @@
+// inject css
+var link = document.createElement("link");
+link.href = chrome.runtime.getURL(`popup.css`);
+link.type = "text/css";
+link.rel = "stylesheet";
+document.getElementsByTagName("head")[0].appendChild(link);
+
 var currInstruction = 0;
 var ingredientsText = []
 var instructionsText = []

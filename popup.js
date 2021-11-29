@@ -1,20 +1,69 @@
 // inject css
-var link = document.createElement("link");
-link.href = chrome.runtime.getURL(`popup.css`);
-link.type = "text/css";
-link.rel = "stylesheet";
-document.getElementsByTagName("head")[0].appendChild(link);
+if (!document.getElementById("cssStylesheet")) {
+  var link = document.createElement("link");
+  link.href = chrome.runtime.getURL(`popup.css`);
+  link.type = "text/css";
+  link.id = "cssStylesheet";
+  link.rel = "stylesheet";
+  document.getElementsByTagName("head")[0].appendChild(link);
+}
 
+if (!document.getElementById("fontStylesheet")) {
+  var font = document.createElement('link');
+  font.rel = 'stylesheet';
+  font.href = 'https://fonts.googleapis.com/css2?family=Montserrat&family=Pattaya&family=Ubuntu&display=swap';
+  font.id = "fontStylesheet";
+  document.head.appendChild(font);
+}
+
+// data initialization
 var currInstruction = 0;
 var ingredientsText = []
 var instructionsText = []
+var numWeek = 1;
 
-// nested dictionary, first level is by week and next level is by weekday
+// plannerDict: nested dictionary, first level is by week and next level is by weekday
 chrome.storage.sync.get(['plannerDict'], function(result) {
   if (result['plannerDict'] === 'undefined') {
     chrome.storage.sync.set({'plannerDict': {}})
   }
 });
+
+// source: https://stackoverflow.com/questions/1025693/how-to-get-next-week-date-in-javascript
+Date.prototype.getNextWeekDay = function(d) {
+  if (d) {
+    var next = this;
+    next.setDate(this.getDate() - this.getDay() + 7 + d);
+    return next;
+  }
+}
+
+Date.prototype.getCurrWeekDay = function(d) {
+  if (d) {
+    var next = this;
+    next.setDate(this.getDate() - this.getDay() + d);
+    return next;
+  }
+}
+
+var weeks = ["Select Week", "This Week", "Next Week"];
+var weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// generate next few weeks
+var now = new Date();
+var nextDate = now.getNextWeekDay(1);
+console.log("date: ", now.getCurrWeekDay.getDate());
+var nextNextDate = new Date(nextDate).getNextWeekDay(1);
+
+for (var i=0; i < 8; i++) {
+  var date = new Date(nextNextDate).getNextWeekDay(1);
+  var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
+  weeks.push(dateString);
+  nextNextDate = date;
+}
+console.log(weeks);
+
+// show extension popup
+showRecipe();
 
 function showRecipe() {
   // check if recipe view was already created
@@ -26,6 +75,14 @@ function showRecipe() {
 
   // parse for ingredients
   const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li'));
+  // if no ingredients/recipe found, then we show planner view
+  console.log("blahhhh");
+  console.log(ingredients);
+  if (ingredients.length === 0) {
+    console.log("blah2");
+    showPlanner(false);
+    return;
+  }
   for (var i = 0; i < ingredients.length; i++) {
     ingredientsText.push(ingredients[i].textContent);
   }
@@ -37,13 +94,6 @@ function showRecipe() {
   }
 
   // create Recipe Buddy interface
-
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Pattaya&family=Ubuntu&display=swap';
-  document.head.appendChild(link);
-
-  // create recipe buddy overlay
   box = document.createElement("div");
   box.id = "recipeBox";
   document.body.insertBefore(box, document.body.firstChild);
@@ -61,6 +111,13 @@ function showRecipe() {
   switchToPlanner.id = "switchToPlanner";
   switchToPlanner.addEventListener("click", switchPlanner);
   box.appendChild(switchToPlanner);
+
+  // add close option
+  const close = document.createElement("p");
+  close.innerHTML = "&#x2715";
+  close.id = "closeRecipe";
+  close.addEventListener("click", closeRecipe);
+  box.appendChild(close);
 
   // add ingredients to HTML
   const ingredientsBox = document.createElement("div");
@@ -147,10 +204,22 @@ function showRecipe() {
   box.appendChild(addToPlanner);
 }
 
-function switchPlanner() {
+function closeRecipe() {
   // hide recipe box
   var recipeBox = document.getElementById("recipeBox");
   recipeBox.setAttribute('style', 'display: none !important');
+}
+
+function closePlanner() {
+  // hide planner box
+  var plannerBox = document.getElementById("plannerBox");
+  plannerBox.setAttribute('style', 'display: none !important');
+  numWeek = 1;
+}
+
+function switchPlanner() {
+  // hide recipe box
+  closeRecipe();
 
   // show planner view, with switch option
   showPlanner(true);
@@ -158,15 +227,11 @@ function switchPlanner() {
 
 function switchRecipe() {
   // hide planner box
-  var plannerBox = document.getElementById("plannerBox");
-  plannerBox.setAttribute('style', 'display: none !important');
-  numWeek = 1;
+  closePlanner();
 
   // show recipe view
   showRecipe();
 }
-
-var numWeek = 1;
 
 function showPlanner(switchOption) {
   // check if planner view was already created
@@ -202,6 +267,13 @@ function showPlanner(switchOption) {
     switchToRecipe.addEventListener("click", switchRecipe);
     box.appendChild(switchToRecipe);
   }
+
+  // add close option
+  const close = document.createElement("p");
+  close.innerHTML = "&#x2715";
+  close.id = "closePlanner";
+  close.addEventListener("click", closePlanner);
+  box.appendChild(close);
 
   // add week, and ability to switch weeks
   const weekBox = document.createElement("div");
@@ -335,30 +407,6 @@ function changeInstruction(delta) {
   }
 }
 
-// source: https://stackoverflow.com/questions/1025693/how-to-get-next-week-date-in-javascript
-Date.prototype.getNextWeekDay = function(d) {
-  if (d) {
-    var next = this;
-    next.setDate(this.getDate() - this.getDay() + 7 + d);
-    return next;
-  }
-}
-
-const weeks = ["Select Week", "This Week", "Next Week"];
-const weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-// generate next few weeks
-var now = new Date();
-var nextDate = now.getNextWeekDay(1);
-var nextNextDate = new Date(nextDate).getNextWeekDay(1);
-
-for (var i=0; i < 8; i++) {
-  var date = new Date(nextNextDate).getNextWeekDay(1);
-  var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
-  weeks.push(dateString);
-  nextNextDate = date;
-}
-console.log(weeks);
-
 function addPlanner() {
   // hide add to planner button
   const addToPlanner = document.getElementById("addToPlanner");
@@ -487,9 +535,4 @@ function submitToPlanner() {
 function hideBox() {
   const box = document.getElementById("recipeBox");
   box.setAttribute('style', 'display: none !important');
-}
-
-
-if (document.location.hostname === 'damndelicious.net') {
-  showRecipe();
 }

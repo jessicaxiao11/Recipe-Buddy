@@ -31,8 +31,19 @@
   color: #FAA556;
   position: absolute;
   top: 10px;
-  right: 20px;
+  right: 60px;
   text-decoration-line: underline;
+  cursor: pointer;
+}
+
+#closeRecipe, #closePlanner {
+  margin: 0;
+  font-family: 'Montserrat';
+  font-size: 18px;
+  color: grey;
+  position: absolute;
+  top: 7px;
+  right: 20px;
   cursor: pointer;
 }
 

@@ -299,4 +299,20 @@ option {
   font-size: 18px;
 }
 
+.recipeDiv {
+  background-color: #FFE2C8;
+  border-radius: 15px;
+  text-align: center;
+  margin: 15px 5px 15px 5px;
+  cursor: pointer;
+}
+
+.recipeDivP {
+  font-family: 'Ubuntu';
+  font-size: 14px;
+  margin: 0px;
+  padding: 10px;
+  line-height: 20px;
+}
+
 

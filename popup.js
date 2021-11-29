@@ -2,6 +2,13 @@ var currInstruction = 0;
 var ingredientsText = []
 var instructionsText = []
 
+// nested dictionary, first level is by week and next level is by weekday
+chrome.storage.sync.get(['plannerDict'], function(result) {
+  if (result['plannerDict'] === 'undefined') {
+    chrome.storage.sync.set({'plannerDict': {}})
+  }
+});
+
 function showRecipe() {
   // check if recipe view was already created
   var box = document.getElementById("recipeBox");
@@ -157,8 +164,13 @@ function showPlanner(switchOption) {
   // check if planner view was already created
   var box = document.getElementById("plannerBox");
   if (box !== null) {
-    box.setAttribute('style', 'display: block !important');
-    return;
+    // box.setAttribute('style', 'display: block !important');
+    // return;
+
+    if (box.parentNode) {
+      box.parentNode.removeChild(box);
+      console.log("removed");
+    }
   }
 
   // create planner box overlay
@@ -210,28 +222,48 @@ function showPlanner(switchOption) {
   const weekdaysBox = document.createElement("div");
   weekdaysBox.id = "weekdays";
   box.appendChild(weekdaysBox);
-  console.log("here");
 
-  for (var i = 1; i < weekdays.length; i++) {
-    console.log("blah");
-    const weekday = document.createElement("div");
-    weekday.className = "weekday";
-    if (i === weekdays.length - 1) {
-      weekday.id = "lastWeekday";
+
+  chrome.storage.sync.get(['plannerDict'], function(result) {
+    var plannerDict = result["plannerDict"];
+    if (plannerDict === 'undefined') {
+      plannerDict = {};
     }
-    weekdaysBox.appendChild(weekday);
 
-    // create p element for weekday
-    const weekdayP = document.createElement("p");
-    weekdayP.innerHTML = weekdays[i];
-    weekdayP.className = "weekdayP";
-    weekday.appendChild(weekdayP);
+    console.log(plannerDict);
 
-    // add recipes to planner
-    // const recipe1 = document.
-
-    // add clickable div, store url of webpage
-  }
+    for (var i = 1; i < weekdays.length; i++) {
+      const weekday = document.createElement("div");
+      weekday.className = "weekday";
+      if (i === weekdays.length - 1) {
+        weekday.id = "lastWeekday";
+      }
+      weekdaysBox.appendChild(weekday);
+  
+      // create p element for weekday
+      const weekdayP = document.createElement("p");
+      weekdayP.innerHTML = weekdays[i];
+      weekdayP.className = "weekdayP";
+      weekday.appendChild(weekdayP);
+  
+      if (numWeek in plannerDict && i in plannerDict[numWeek]) {
+        var currRecipes = plannerDict[numWeek][i];
+        for (var j = 0; j < currRecipes.length; j++) {
+          var recipeName = currRecipes[j][0];
+          var recipeURL = currRecipes[j][1];
+  
+          const recipeDiv = document.createElement("div");
+          recipeDiv.className = "recipeDiv";
+          recipeDiv.addEventListener('click', function() {window.location.href=recipeURL;});
+          const recipeDivP = document.createElement("p");
+          recipeDivP.className = "recipeDivP";
+          recipeDivP.innerHTML = recipeName;
+          weekday.appendChild(recipeDiv);
+          recipeDiv.appendChild(recipeDivP);
+        }
+      }
+    }
+  });
 }
 
 function changeWeek(delta) {
@@ -368,35 +400,47 @@ function addPlanner() {
   box.appendChild(add);
 }
 
-// nested dictionary, first level is by week and next level is by weekday
-var plannerDict = {};
-
 function submitToPlanner() {
   // add recipe to planner storage
   var selectWeek = document.getElementById("selectWeek");
-  var week = selectWeek.options[selectWeek.selectedIndex].value - 1;
+  var week = selectWeek.options[selectWeek.selectedIndex].value;
 
   var selectWeekday = document.getElementById("selectWeekday");
-  var weekday = selectWeekday.options[selectWeekday.selectedIndex].value - 1;
+  var weekday = selectWeekday.options[selectWeekday.selectedIndex].value;
 
   var recipeName = (document.getElementsByClassName("post-title"))[0].innerHTML;
+  var recipeURL = window.location.toString();
 
-  if (week in plannerDict) {
-    var weekRecipes = plannerDict[week];
-    if (weekday in weekRecipes) {
-      var weekdayRecipes = weekRecipes[weekday];
-      weekdayRecipes.push(recipeName);
-    } else {
-      var weekdayRecipes = [recipeName];
+  chrome.storage.sync.get(['plannerDict'], function(result) {
+    console.log("reached");
+    var plannerDict = result['plannerDict'];
+    console.log("ofwefowejfoi: ", plannerDict);
+    if (plannerDict === 'undefined') {
+      plannerDict = {};
     }
 
-    weekRecipes[weekday] = weekdayRecipes;
-    plannerDict[week] = weekRecipes;
-  } else {
-    var weekRecipes = {}
-    weekRecipes[weekday] = [recipeName];
-    plannerDict[week] = weekRecipes;
-  }
+    if (week in plannerDict) {
+      var weekRecipes = plannerDict[week];
+      if (weekday in weekRecipes) {
+        var weekdayRecipes = weekRecipes[weekday];
+        weekdayRecipes.push([recipeName, recipeURL]);
+      } else {
+        var weekdayRecipes = [[recipeName, recipeURL]];
+      }
+  
+      weekRecipes[weekday] = weekdayRecipes;
+      plannerDict[week] = weekRecipes;
+    } else {
+      var weekRecipes = {};
+      weekRecipes[weekday] = [[recipeName, recipeURL]];
+      plannerDict[week] = weekRecipes;
+    }
+    console.log("hello: ", plannerDict);
+  
+    chrome.storage.sync.set({"plannerDict": plannerDict});
+    console.log("boifjoi: ", plannerDict);
+    
+  });
 
   // show add to planner button
   const addToPlanner = document.getElementById("addToPlanner");

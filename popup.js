@@ -216,7 +216,21 @@ function showPlanner(switchOption) {
     console.log("blah");
     const weekday = document.createElement("div");
     weekday.className = "weekday";
+    if (i === weekdays.length - 1) {
+      weekday.id = "lastWeekday";
+    }
     weekdaysBox.appendChild(weekday);
+
+    // create p element for weekday
+    const weekdayP = document.createElement("p");
+    weekdayP.innerHTML = weekdays[i];
+    weekdayP.className = "weekdayP";
+    weekday.appendChild(weekdayP);
+
+    // add recipes to planner
+    // const recipe1 = document.
+
+    // add clickable div, store url of webpage
   }
 }
 

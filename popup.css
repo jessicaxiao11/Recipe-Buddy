@@ -269,9 +269,9 @@ option {
 
 #weekdays {
   position: relative;
-  left: 40px;
-  top: 100px;
-  width: 740px;
+  left: 30px;
+  top: 30px;
+  width: 960px;
 }
 
 #weekdays:after {
@@ -281,11 +281,22 @@ option {
 }
 
 .weekday {
-  background-color:rgba(0, 0, 0, 0.2);
   float: left;
-  margin-left: 20px;
-  height: 700px;
-  width: 200px;
+  height: 500px;
+  width: 130px;
+  border-right: 1px solid black;
+  text-align: center;
+}
+
+#lastWeekday {
+  border: none;
+}
+
+.weekdayP {
+  margin: 0;
+  /* padding-left: 20px; */
+  font-family: 'Ubuntu';
+  font-size: 18px;
 }
 
 

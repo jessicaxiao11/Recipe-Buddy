@@ -24,46 +24,42 @@ var numWeek = 1;
 
 // plannerDict: nested dictionary, first level is by week and next level is by weekday
 chrome.storage.sync.get(['plannerDict'], function(result) {
-  if (result['plannerDict'] === 'undefined') {
+  if (result['plannerDict'] === undefined) {
     chrome.storage.sync.set({'plannerDict': {}})
   }
 });
 
 // source: https://stackoverflow.com/questions/1025693/how-to-get-next-week-date-in-javascript
-Date.prototype.getNextWeekDay = function(d) {
-  if (d) {
-    var next = this;
-    next.setDate(this.getDate() - this.getDay() + 7 + d);
-    return next;
-  }
+Date.prototype.getNextStart = function() {
+  var next = this;
+  next.setDate(this.getDate() - this.getDay() + 7 + 1);
+  return next;
 }
 
-Date.prototype.getCurrWeekDay = function(d) {
-  if (d) {
-    var next = this;
-    next.setDate(this.getDate() - this.getDay() + d);
-    return next;
-  }
+Date.prototype.startOfWeek = function() {
+  var next = this;
+  next.setDate(this.getDate() - this.getDay() + 1);
+  return next;
 }
 
-var weeks = ["Select Week", "This Week", "Next Week"];
+var weeks = ["Select Week"];
 var weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 // generate next few weeks
 var now = new Date();
-var nextDate = now.getNextWeekDay(1);
-console.log("date: ", now.getCurrWeekDay.getDate());
-var nextNextDate = new Date(nextDate).getNextWeekDay(1);
+var date = now.startOfWeek();
+var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
+weeks.push(dateString);
 
-for (var i=0; i < 8; i++) {
-  var date = new Date(nextNextDate).getNextWeekDay(1);
-  var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
+for (var i=0; i < 9; i++) {
+  date = new Date(date).getNextStart();
+  dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
   weeks.push(dateString);
-  nextNextDate = date;
 }
-console.log(weeks);
 
 // show extension popup
 showRecipe();
+// chrome.storage.sync.clear();
 
 function showRecipe() {
   // check if recipe view was already created
@@ -74,7 +70,7 @@ function showRecipe() {
   }
 
   // parse for ingredients
-  const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li'));
+  const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li, .wprm-recipe-ingredient-group>ul>li'));
   // if no ingredients/recipe found, then we show planner view
   console.log("blahhhh");
   console.log(ingredients);
@@ -88,7 +84,7 @@ function showRecipe() {
   }
 
   // parse for instructions
-  const instructions = Array.from(document.querySelectorAll('.instructions>ol>li'));
+  const instructions = Array.from(document.querySelectorAll('.instructions>ol>li, .wprm-recipe-instruction-group>ul>li'));
   for (var i = 0; i < instructions.length; i++) {
     instructionsText.push(instructions[i].textContent);
   }
@@ -99,14 +95,14 @@ function showRecipe() {
   document.body.insertBefore(box, document.body.firstChild);
 
   // add recipe buddy title
-  const title = document.createElement("p");
+  const title = document.createElement("h1");
   const text = document.createTextNode("Recipe Buddy");
   title.id = "title";
   title.appendChild(text);
   box.appendChild(title);
 
   // add switch option
-  const switchToPlanner = document.createElement("p");
+  const switchToPlanner = document.createElement("h3");
   switchToPlanner.innerHTML = "switch to planner view";
   switchToPlanner.id = "switchToPlanner";
   switchToPlanner.addEventListener("click", switchPlanner);
@@ -168,12 +164,14 @@ function showRecipe() {
 
   const back = document.createElement("img");
   const arrow = chrome.runtime.getURL(`images/arrow.png`);
+  back.alt = "back arrow for instructions";
   back.src = arrow;
   back.id = "back";
   back.addEventListener("click", function(){changeInstruction(-1)});
   instructionsBox.appendChild(back);
 
   const next = document.createElement("img");
+  next.alt = "next arrow for instructions";
   next.src = arrow
   next.id = "next";
   next.addEventListener("click", function(){changeInstruction(1)});
@@ -183,7 +181,7 @@ function showRecipe() {
   instruction.id = "instruction";
   instructionsBox.appendChild(instruction);
 
-  const instructionNum = document.createElement("p");
+  const instructionNum = document.createElement("h2");
   instructionNum.id = "instructionNum";
   instructionNum.innerHTML = "1.";
   instruction.appendChild(instructionNum);
@@ -195,11 +193,11 @@ function showRecipe() {
 
   // add Add to Planner button
   const addToPlanner = document.createElement("div");
-  const addToPlannerP = document.createElement("p");
-  addToPlannerP.id = "addToPlannerP";
-  addToPlannerP.innerHTML = "Add to Planner";
+  const addToPlannerHeading = document.createElement("h3");
+  addToPlannerHeading.id = "addToPlannerHeading";
+  addToPlannerHeading.innerHTML = "Add to Planner";
   addToPlanner.id = "addToPlanner";
-  addToPlanner.appendChild(addToPlannerP);
+  addToPlanner.appendChild(addToPlannerHeading);
   addToPlanner.addEventListener('click', addPlanner);
   box.appendChild(addToPlanner);
 }
@@ -252,7 +250,7 @@ function showPlanner(switchOption) {
   document.body.insertBefore(box, document.body.firstChild);
 
   // add recipe buddy title
-  const title = document.createElement("p");
+  const title = document.createElement("h1");
   const text = document.createTextNode("Recipe Buddy");
   title.id = "plannerTitle";
   title.appendChild(text);
@@ -261,7 +259,7 @@ function showPlanner(switchOption) {
 
   // if switchOption, add switch to recipe view
   if (switchOption) {
-    const switchToRecipe = document.createElement("p");
+    const switchToRecipe = document.createElement("h3");
     switchToRecipe.innerHTML = "switch to recipe view";
     switchToRecipe.id = "switchToRecipe";
     switchToRecipe.addEventListener("click", switchRecipe);
@@ -282,18 +280,20 @@ function showPlanner(switchOption) {
 
   const prev = document.createElement("img");
   const arrow = chrome.runtime.getURL(`images/arrow.png`);
+  prev.alt = "back arrow for week in planner";
   prev.src = arrow;
   prev.id = "prevWeek";
   prev.addEventListener("click", function(){changeWeek(-1)});
   weekBox.appendChild(prev);
 
   const next = document.createElement("img");
+  next.alt = "next arrow for week in planner";
   next.src = arrow
   next.id = "nextWeek";
   next.addEventListener("click", function(){changeWeek(1)});
   weekBox.appendChild(next);
 
-  const week = document.createElement("p");
+  const week = document.createElement("h4");
   week.id = "weekPlanner";
   week.innerHTML = weeks[numWeek];
   weekBox.appendChild(week);
@@ -343,7 +343,9 @@ function drawWeekdays() {
 
   chrome.storage.sync.get(['plannerDict'], function(result) {
     var plannerDict = result["plannerDict"];
-    if (plannerDict === 'undefined') {
+    console.log(plannerDict);
+    if (plannerDict === undefined) {
+      console.log(plannerDict);
       plannerDict = {};
     }
 
@@ -358,16 +360,18 @@ function drawWeekdays() {
       weekdaysBox.appendChild(weekday);
   
       // create p element for weekday
-      const weekdayP = document.createElement("p");
-      weekdayP.innerHTML = weekdays[i];
-      weekdayP.className = "weekdayP";
-      weekday.appendChild(weekdayP);
+      const weekdayHeading = document.createElement("h3");
+      weekdayHeading.innerHTML = weekdays[i];
+      weekdayHeading.className = "weekdayHeading";
+      weekday.appendChild(weekdayHeading);
+
+      var weekString = weeks[numWeek];
   
-      if (numWeek in plannerDict && i in plannerDict[numWeek]) {
-        var currRecipes = plannerDict[numWeek][i];
+      if (weekString in plannerDict && i in plannerDict[weekString]) {
+        var currRecipes = plannerDict[weekString][i];
         for (var j = 0; j < currRecipes.length; j++) {
           var recipeName = currRecipes[j][0];
-          var recipeURL = currRecipes[j][1];
+          const recipeURL = currRecipes[j][1];
   
           const recipeDiv = document.createElement("div");
           recipeDiv.className = "recipeDiv";
@@ -414,7 +418,7 @@ function addPlanner() {
 
   // extend size of instruction box
   const box = document.getElementById("recipeBox");
-  box.setAttribute('style', 'height: 800px !important');
+  // box.setAttribute('style', 'height: 800px !important');
 
   // check if dropdowns already created
   var dropdowns = document.getElementById("dropdowns");
@@ -441,7 +445,7 @@ function addPlanner() {
 
   for (var i=0; i < weeks.length; i++) {
     const option = document.createElement("option");
-    option.value = i;
+    option.value = weeks[i];
     option.innerHTML = weeks[i];
     selectWeek.append(option);
   }
@@ -463,10 +467,10 @@ function addPlanner() {
 
   // add "Add!" button
   add = document.createElement("div");
-  const addP = document.createElement("p");
-  addP.innerHTML = "Add!";
+  const addHeading = document.createElement("h3");
+  addHeading.innerHTML = "Add!";
   add.id = "add";
-  add.appendChild(addP);
+  add.appendChild(addHeading);
   add.addEventListener('click', submitToPlanner);
   box.appendChild(add);
 }
@@ -488,7 +492,7 @@ function submitToPlanner() {
     console.log("reached");
     var plannerDict = result['plannerDict'];
     console.log("ofwefowejfoi: ", plannerDict);
-    if (plannerDict === 'undefined') {
+    if (plannerDict === undefined) {
       plannerDict = {};
     }
 
@@ -521,7 +525,7 @@ function submitToPlanner() {
 
   // reset size of instruction box
   const box = document.getElementById("recipeBox");
-  box.setAttribute('style', 'height: 775px !important');
+  // box.setAttribute('style', 'height: 775px !important');
 
   // hide dropdowns
   const dropdowns = document.getElementById("dropdowns");

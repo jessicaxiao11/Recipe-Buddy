@@ -1,4 +1,6 @@
-// inject css
+// Reference for google extension usage: https://github.com/sean-public/RecipeFilter/tree/master/src/js
+
+/* Inject css/font stylesheets */
 if (!document.getElementById("cssStylesheet")) {
   var link = document.createElement("link");
   link.href = chrome.runtime.getURL(`popup.css`);
@@ -16,18 +18,23 @@ if (!document.getElementById("fontStylesheet")) {
   document.head.appendChild(font);
 }
 
-// data initialization
+/* Data Initialization */
 var currInstruction = 0;
 var ingredientsText = []
 var instructionsText = []
 var numWeek = 1;
 
-// plannerDict: nested dictionary, first level is by week and next level is by weekday
+// plannerDict: stores recipes added to planner
+// format: nested dictionary, first level is by week and next level is by weekday
 chrome.storage.sync.get(['plannerDict'], function(result) {
   if (result['plannerDict'] === undefined) {
     chrome.storage.sync.set({'plannerDict': {}})
   }
 });
+
+// populate weekdays and next few weeks
+var weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+var weeks = ["Select Week"];
 
 // source: https://stackoverflow.com/questions/1025693/how-to-get-next-week-date-in-javascript
 Date.prototype.getNextStart = function() {
@@ -42,10 +49,6 @@ Date.prototype.startOfWeek = function() {
   return next;
 }
 
-var weeks = ["Select Week"];
-var weekdays = ["Select Weekday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-// generate next few weeks
 var now = new Date();
 var date = now.startOfWeek();
 var dateString = "Week of " + date.toLocaleString('default', { month: 'short' }) + " " + date.getDate();
@@ -57,25 +60,26 @@ for (var i=0; i < 9; i++) {
   weeks.push(dateString);
 }
 
-// show extension popup
-showRecipe();
-// chrome.storage.sync.clear();
 
+
+
+/* Show extension popup */
+showRecipe();
+
+/* Show the recipe popup. If page has no recipe, we default to showing the
+ * planner view. */
 function showRecipe() {
-  // check if recipe view was already created
+  // If recipe view already created, then just reveal it
   var box = document.getElementById("recipeBox");
   if (box !== null) {
     box.setAttribute('style', 'display: block !important');
     return;
   }
 
-  // parse for ingredients
+  // Parse ingredients/instructions
   const ingredients = Array.from(document.querySelectorAll('.ingredients>ul>li, .wprm-recipe-ingredient-group>ul>li'));
-  // if no ingredients/recipe found, then we show planner view
-  console.log("blahhhh");
-  console.log(ingredients);
+  // If no recipe found, show planner view
   if (ingredients.length === 0) {
-    console.log("blah2");
     showPlanner(false);
     return;
   }
@@ -83,39 +87,39 @@ function showRecipe() {
     ingredientsText.push(ingredients[i].textContent);
   }
 
-  // parse for instructions
   const instructions = Array.from(document.querySelectorAll('.instructions>ol>li, .wprm-recipe-instruction-group>ul>li'));
   for (var i = 0; i < instructions.length; i++) {
     instructionsText.push(instructions[i].textContent);
   }
 
-  // create Recipe Buddy interface
+
+  // Create Recipe Buddy HTML interface
   box = document.createElement("div");
   box.id = "recipeBox";
   document.body.insertBefore(box, document.body.firstChild);
 
-  // add recipe buddy title
+  // Add recipe buddy title
   const title = document.createElement("h1");
   const text = document.createTextNode("Recipe Buddy");
   title.id = "title";
   title.appendChild(text);
   box.appendChild(title);
 
-  // add switch option
+  // Add switch option
   const switchToPlanner = document.createElement("h3");
   switchToPlanner.innerHTML = "switch to planner view";
   switchToPlanner.id = "switchToPlanner";
   switchToPlanner.addEventListener("click", switchPlanner);
   box.appendChild(switchToPlanner);
 
-  // add close option
+  // Add close option
   const close = document.createElement("p");
   close.innerHTML = "&#x2715";
   close.id = "closeRecipe";
   close.addEventListener("click", closeRecipe);
   box.appendChild(close);
 
-  // add ingredients to HTML
+  // Add ingredients to HTML
   const ingredientsBox = document.createElement("div");
   ingredientsBox.id = "ingredientsBox";
   box.appendChild(ingredientsBox);
@@ -157,7 +161,7 @@ function showRecipe() {
     ingredientsRight.appendChild(br);
   }
 
-  // add first instruction to HTML
+  // Add first instruction to HTML
   const instructionsBox = document.createElement("div");
   instructionsBox.id = "instructionsBox";
   box.appendChild(instructionsBox);
@@ -191,7 +195,7 @@ function showRecipe() {
   instructionText.innerHTML = instructionsText[0];
   instruction.appendChild(instructionText);
 
-  // add Add to Planner button
+  // Add Add to Planner button
   const addToPlanner = document.createElement("div");
   const addToPlannerHeading = document.createElement("h3");
   addToPlannerHeading.id = "addToPlannerHeading";
@@ -202,19 +206,20 @@ function showRecipe() {
   box.appendChild(addToPlanner);
 }
 
+/* Hide recipe box if user chooses to close out of the popup */
 function closeRecipe() {
-  // hide recipe box
   var recipeBox = document.getElementById("recipeBox");
   recipeBox.setAttribute('style', 'display: none !important');
 }
 
+/* Hide planner box if user chooses to close out of the popup */
 function closePlanner() {
-  // hide planner box
   var plannerBox = document.getElementById("plannerBox");
   plannerBox.setAttribute('style', 'display: none !important');
   numWeek = 1;
 }
 
+/* Switch from recipe view to planner view */
 function switchPlanner() {
   // hide recipe box
   closeRecipe();
@@ -223,6 +228,7 @@ function switchPlanner() {
   showPlanner(true);
 }
 
+/* Switch from planner view to recipe view */
 function switchRecipe() {
   // hide planner box
   closePlanner();
@@ -231,25 +237,24 @@ function switchRecipe() {
   showRecipe();
 }
 
+/* Show planner popup. If switchOption == true, user will have access to a 
+ * button to switch back a recipe view. */
 function showPlanner(switchOption) {
-  // check if planner view was already created
+  // If planner view already created, delete the box. We want to reproduce this
+  // the view, since planner could have changed.
   var box = document.getElementById("plannerBox");
   if (box !== null) {
-    // box.setAttribute('style', 'display: block !important');
-    // return;
-
     if (box.parentNode) {
       box.parentNode.removeChild(box);
-      console.log("removed");
     }
   }
 
-  // create planner box overlay
+  // Create planner box overlay
   box = document.createElement("div");
   box.id = "plannerBox";
   document.body.insertBefore(box, document.body.firstChild);
 
-  // add recipe buddy title
+  // Add recipe buddy title
   const title = document.createElement("h1");
   const text = document.createTextNode("Recipe Buddy");
   title.id = "plannerTitle";
@@ -257,7 +262,7 @@ function showPlanner(switchOption) {
   box.appendChild(title);
 
 
-  // if switchOption, add switch to recipe view
+  // If switchOption, add switch to recipe view
   if (switchOption) {
     const switchToRecipe = document.createElement("h3");
     switchToRecipe.innerHTML = "switch to recipe view";
@@ -266,14 +271,14 @@ function showPlanner(switchOption) {
     box.appendChild(switchToRecipe);
   }
 
-  // add close option
+  // Add close option
   const close = document.createElement("p");
   close.innerHTML = "&#x2715";
   close.id = "closePlanner";
   close.addEventListener("click", closePlanner);
   box.appendChild(close);
 
-  // add week, and ability to switch weeks
+  // Add week, and ability to switch weeks
   const weekBox = document.createElement("div");
   weekBox.id = "weekBox";
   box.appendChild(weekBox);
@@ -298,17 +303,23 @@ function showPlanner(switchOption) {
   week.innerHTML = weeks[numWeek];
   weekBox.appendChild(week);
 
+  // add weekdays and recipes for each day
   drawWeekdays();
 }
 
+/* Change the week that is displayed in the planner. delta represents how much
+ * to change (i.e. delta = -1 would mean we go back one week) */
 function changeWeek(delta) {
+  // Out of bounds check
   if (numWeek + delta < 1 || numWeek + delta >= weeks.length) {
     return;
   }
+  // Modify data and displayed HTML
   numWeek += delta;
   const week = document.getElementById("weekPlanner");
   week.innerHTML = weeks[numWeek];
 
+  // Set correct opacity for prev/next arrows
   const prev = document.getElementById("prevWeek");
   const next = document.getElementById("nextWeek");
   prev.style.opacity = "0.6";
@@ -322,11 +333,13 @@ function changeWeek(delta) {
     next.style.opacity = "0.2";
   }
 
+  // redraw recipes for each day
   drawWeekdays();
 }
 
+/* Draw HTML that displays recipes for each day of the week in the planner */
 function drawWeekdays() {
-  // remove old weekdays if one existed
+  // Remove old weekdays if one existed
   var weekdaysBox = document.getElementById("weekdays");
   if (weekdaysBox) {
     if (weekdaysBox.parentNode) {
@@ -334,23 +347,20 @@ function drawWeekdays() {
     }
   }
 
-  // display weekdays
+  // Display weekdays
   weekdaysBox = document.createElement("div");
   weekdaysBox.id = "weekdays";
   const box = document.getElementById("plannerBox");
   box.appendChild(weekdaysBox);
 
-
+  // Retrieve plannerDict data
   chrome.storage.sync.get(['plannerDict'], function(result) {
     var plannerDict = result["plannerDict"];
-    console.log(plannerDict);
     if (plannerDict === undefined) {
-      console.log(plannerDict);
       plannerDict = {};
     }
 
-    console.log(plannerDict);
-
+    // Populate each day
     for (var i = 1; i < weekdays.length; i++) {
       const weekday = document.createElement("div");
       weekday.className = "weekday";
@@ -359,14 +369,15 @@ function drawWeekdays() {
       }
       weekdaysBox.appendChild(weekday);
   
-      // create p element for weekday
+      // Create p element for weekday
       const weekdayHeading = document.createElement("h3");
       weekdayHeading.innerHTML = weekdays[i];
       weekdayHeading.className = "weekdayHeading";
       weekday.appendChild(weekdayHeading);
 
       var weekString = weeks[numWeek];
-  
+      
+      // Add recipes if there are any for that day
       if (weekString in plannerDict && i in plannerDict[weekString]) {
         var currRecipes = plannerDict[weekString][i];
         for (var j = 0; j < currRecipes.length; j++) {
@@ -387,16 +398,22 @@ function drawWeekdays() {
   });
 }
 
+/* Change the instruction that is displayed in the recipe view. delta represents how much
+ * to change (i.e. delta = -1 would mean we go back one week) */
 function changeInstruction(delta) {
+  // Out of bounds check
   if (currInstruction + delta < 0 || currInstruction + delta >= instructionsText.length) {
     return;
   }
+
+  // Modify data and HTML
   currInstruction += delta;
   const instructionNum = document.getElementById("instructionNum");
   const instructionText = document.getElementById("instructionText");
   instructionNum.innerHTML = (currInstruction + 1).toString() + ".";
   instructionText.innerHTML = instructionsText[currInstruction];
 
+  // Set correct opacity for back/next arrows
   const back = document.getElementById("back");
   const next = document.getElementById("next");
   back.style.opacity = "0.6";
@@ -411,16 +428,14 @@ function changeInstruction(delta) {
   }
 }
 
+/* Modify interface so user can add recipe to planner after they click 
+ * "Add To Planner" */
 function addPlanner() {
-  // hide add to planner button
+  // Hide add to planner button
   const addToPlanner = document.getElementById("addToPlanner");
   addToPlanner.style.display = "none";
 
-  // extend size of instruction box
-  const box = document.getElementById("recipeBox");
-  // box.setAttribute('style', 'height: 800px !important');
-
-  // check if dropdowns already created
+  // Check if dropdowns already created, return if so
   var dropdowns = document.getElementById("dropdowns");
   var add = document.getElementById("add");
   if (dropdowns !== null) {
@@ -429,7 +444,8 @@ function addPlanner() {
     return;
   }
 
-  // add dropdowns
+  // Add dropdowns
+  const box = document.getElementById("recipeBox");
   dropdowns = document.createElement("div");
   dropdowns.id = "dropdowns";
   box.appendChild(dropdowns);
@@ -465,7 +481,7 @@ function addPlanner() {
     selectWeekday.append(option);
   }
 
-  // add "Add!" button
+  // Add "Add!" button
   add = document.createElement("div");
   const addHeading = document.createElement("h3");
   addHeading.innerHTML = "Add!";
@@ -475,8 +491,10 @@ function addPlanner() {
   box.appendChild(add);
 }
 
+/* Persist recipe to plannerDict after user clicks "Add!", and revert to 
+ * original recipe interface */
 function submitToPlanner() {
-  // add recipe to planner storage
+  // Add recipe to planner storage
   var selectWeek = document.getElementById("selectWeek");
   var week = selectWeek.options[selectWeek.selectedIndex].value;
   selectWeek.selectedIndex = 0;
@@ -489,9 +507,7 @@ function submitToPlanner() {
   var recipeURL = window.location.toString();
 
   chrome.storage.sync.get(['plannerDict'], function(result) {
-    console.log("reached");
     var plannerDict = result['plannerDict'];
-    console.log("ofwefowejfoi: ", plannerDict);
     if (plannerDict === undefined) {
       plannerDict = {};
     }
@@ -512,31 +528,19 @@ function submitToPlanner() {
       weekRecipes[weekday] = [[recipeName, recipeURL]];
       plannerDict[week] = weekRecipes;
     }
-    console.log("hello: ", plannerDict);
   
-    chrome.storage.sync.set({"plannerDict": plannerDict});
-    console.log("boifjoi: ", plannerDict);
-    
+    chrome.storage.sync.set({"plannerDict": plannerDict});    
   });
 
-  // show add to planner button
+  // Show add to planner button
   const addToPlanner = document.getElementById("addToPlanner");
   addToPlanner.style.display = "block";
 
-  // reset size of instruction box
-  const box = document.getElementById("recipeBox");
-  // box.setAttribute('style', 'height: 775px !important');
-
-  // hide dropdowns
+  // Hide dropdowns
   const dropdowns = document.getElementById("dropdowns");
   dropdowns.style.display = "none";
 
-  // hide "Add!" button
+  // Hide "Add!" button
   const add = document.getElementById("add");
   add.style.display = "none";
-}
-
-function hideBox() {
-  const box = document.getElementById("recipeBox");
-  box.setAttribute('style', 'display: none !important');
 }

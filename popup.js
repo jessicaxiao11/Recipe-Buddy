@@ -181,19 +181,15 @@ function showRecipe() {
   next.addEventListener("click", function(){changeInstruction(1)});
   instructionsBox.appendChild(next);
 
-  const instruction = document.createElement("div");
-  instruction.id = "instruction";
-  instructionsBox.appendChild(instruction);
-
   const instructionNum = document.createElement("h2");
   instructionNum.id = "instructionNum";
   instructionNum.innerHTML = "1.";
-  instruction.appendChild(instructionNum);
+  instructionsBox.appendChild(instructionNum);
 
   const instructionText = document.createElement("p");
   instructionText.id = "instructionText";
   instructionText.innerHTML = instructionsText[0];
-  instruction.appendChild(instructionText);
+  instructionsBox.appendChild(instructionText);
 
   // Add Add to Planner button
   const addToPlanner = document.createElement("div");
